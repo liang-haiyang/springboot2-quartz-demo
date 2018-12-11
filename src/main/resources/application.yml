@@ -1,0 +1,91 @@
+server:
+  port: 7600
+  servlet:
+    context-path: /platform-data-report
+
+# LOGGING
+logging:
+  config: classpath:logback-spring.xml
+
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      stat-view-servlet:
+        login-username: ENC(GBWS1TZs5u3sW8dE4GsALA==)
+        login-password: ENC(FnghsoPcbn/3O+I+ew7Bbw==)
+        url-pattern: /druid/*
+        enabled: true
+      # 数据源1
+      app:
+        url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+        username: ENC(NX6gJjOj6sB9Zs89KBypGg==)
+        password: ENC(0e7jjjk5wF9jSWX84va/xcj5Y0EIVznL)
+        max-active: 10
+        initial-size: 1
+        max-wait: 6000
+        min-idle: 1
+        filters: stat
+      # 数据源2
+      quartz:
+        url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8
+        username: ENC(NX6gJjOj6sB9Zs89KBypGg==)
+        password: ENC(0e7jjjk5wF9jSWX84va/xcj5Y0EIVznL)
+        max-active: 2
+        initial-size: 1
+        max-wait: 6000
+        min-idle: 1
+        filters: stat
+
+  #  flyway相关
+  flyway:
+    locations: classpath:/sql
+    table: app_meta
+    schemas: iop_platform_data_report,iop_platform_data_report_quartz
+  #  quartz相关
+  quartz:
+    cron: 0 11 11 * * ?
+    interval: 10
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: clusteredScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 10000
+            useProperties: false
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 1
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    #数据库方式
+    job-store-type: jdbc
+    auto-startup: true
+    startup-delay: 1ms
+    overwrite-existing-jobs: true
+#  这里我使用flyway进行初始化, 所以不用quartz再初始化
+#    jdbc:
+#      schema:
+#      initialize-schema: never
+
+jasypt:
+  encryptor:
+    password: EbfYkitulv73I2p0mXI50JMXoaxZTKD4
+
+app:
+  allowOrigins:
+  - 172.16.72.82
+  - 127.0.0.1
+  - localhost
+  - 172.16.72.202
+  - 112.124.39.231
+  - 42.121.131.6
+  - 218.244.141.116
+  - 115.29.207.231
