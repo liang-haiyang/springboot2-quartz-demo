@@ -12,13 +12,12 @@ import javax.annotation.Resource;
 
 /**
  * @author lianghaiyang 2018/10/30 11:27
+ * 在这里必须使用@EnableScheduling，否则不会开始任务
  */
 @EnableScheduling
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class QuartzApplication {
 
-    @Resource
-    private KafkaProducerListener kafkaProducerListener;
     @Resource
     private ApplicationContext applicationContext;
 
@@ -29,8 +28,5 @@ public class QuartzApplication {
     @PostConstruct
     public void listen() {
         ApplicationContextHelper.setApplicationContext(applicationContext);
-        KafkaMsgBackupDispatcher dispatcher = new KafkaMsgBackupDispatcher(kafkaProducerListener.getBlockingDeque());
-        dispatcher.setName("BackupData");
-        dispatcher.start();
     }
 }
